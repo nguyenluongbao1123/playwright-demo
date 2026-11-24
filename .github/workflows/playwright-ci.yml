@@ -11,7 +11,7 @@ jobs:
   healthcare-qa-gate:
     name: Typecheck + HL7/EDI API + Clinical E2E
     timeout-minutes: 20
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CI: "true"
