@@ -1,0 +1,107 @@
+version: "1.0"
+application: "CareFlow EHR & HL7/EDI Clinical Portal"
+updatedAt: "2026-11-24"
+
+pages:
+  patientPortal:
+    route: "/portal/appointments"
+    landmarkTestId: "patient-portal-main"
+    elements:
+      - testId: "ehr-top-nav"
+        tag: "header"
+        role: "banner"
+        required: true
+      - testId: "clinician-session-badge"
+        tag: "span"
+        required: true
+      - testId: "patient-lookup-section"
+        tag: "section"
+        required: true
+      - testId: "patient-mrn-input"
+        tag: "input"
+        required: true
+      - testId: "patient-lookup-btn"
+        tag: "button"
+        required: true
+      - testId: "patient-summary-card"
+        tag: "div"
+        required: true
+      - testId: "appointment-booking-form"
+        tag: "form"
+        required: true
+      - testId: "appointment-department-select"
+        tag: "select"
+        required: true
+      - testId: "appointment-date-input"
+        tag: "input"
+        required: true
+      - testId: "appointment-slot-select"
+        tag: "select"
+        required: true
+      - testId: "appointment-priority-select"
+        tag: "select"
+        required: true
+      - testId: "appointment-clinical-notes"
+        tag: "textarea"
+        required: true
+      - testId: "appointment-submit-btn"
+        tag: "button"
+        required: true
+      - testId: "appointment-confirmation-panel"
+        tag: "section"
+        required: true
+      - testId: "hl7-siu-ack-status"
+        tag: "span"
+        required: true
+      - testId: "appointments-ledger-table"
+        tag: "table"
+        required: true
+
+  orderInventory:
+    route: "/portal/orders-inventory"
+    landmarkTestId: "order-inventory-main"
+    elements:
+      - testId: "ehr-top-nav"
+        tag: "header"
+        role: "banner"
+        required: true
+      - testId: "clinician-session-badge"
+        tag: "span"
+        required: true
+      - testId: "inventory-stock-panel"
+        tag: "section"
+        required: true
+      - testId: "inventory-stock-table"
+        tag: "table"
+        required: true
+      - testId: "supply-order-form"
+        tag: "form"
+        required: true
+      - testId: "order-patient-mrn"
+        tag: "input"
+        required: true
+      - testId: "order-sku-select"
+        tag: "select"
+        required: true
+      - testId: "order-quantity-input"
+        tag: "input"
+        required: true
+      - testId: "order-urgency-select"
+        tag: "select"
+        required: true
+      - testId: "order-pa-verified-checkbox"
+        tag: "input"
+        role: "checkbox"
+        required: true
+      - testId: "order-submit-btn"
+        tag: "button"
+        required: true
+      - testId: "order-sync-result-panel"
+        tag: "section"
+        required: true
+      - testId: "low-stock-alert-banner"
+        tag: "div"
+        required: true
+      - testId: "order-error-alert"
+        tag: "div"
+        required: true

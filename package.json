@@ -1,15 +1,47 @@
 {
-  "name": "playwright-demo",
+  "name": "healthcare-playwright-agentic-qa",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "description": "Enterprise Healthcare QA Automation Framework combining Playwright TypeScript POM with Agentic AI Guardrails (HL7 v2, EDI 837/835, Order & Inventory)",
+  "main": "playwright.config.ts",
+  "scripts": {
+    "test": "playwright test",
+    "test:e2e": "playwright test --project=chromium-e2e",
+    "test:api": "playwright test --project=healthcare-api",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:hl7": "playwright test --grep @hl7",
+    "test:edi": "playwright test --grep @edi",
+    "test:edi:supply-chain": "playwright test tests/api/edi-supply-chain-850-855-856-810.spec.ts",
+    "test:no-flaky": "playwright test --grep-invert @flaky",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "mock:server": "tsx mocks/healthcare-server.ts",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "playwright",
+    "typescript",
+    "healthcare-qa",
+    "hl7-v2",
+    "edi-837",
+    "edi-835",
+    "edi-850",
+    "edi-855",
+    "edi-856",
+    "edi-810",
+    "order-inventory",
+    "agentic-ai",
+    "mcp",
+    "page-object-model"
+  ],
+  "author": "Bao Nguyen Luong",
+  "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.1"
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^22.10.0",
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.2",
+    "typescript": "~5.8.3",
+    "yaml": "^2.7.0"
   }
 }

@@ -1,8 +1,16 @@
-
-# Playwright
+# Dependencies & Build
 node_modules/
+dist/
+
+# Playwright Artifacts & Reports
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/fixtures/.auth/
+
+# Environment & Local Logs
+.env
+.env.local
+task.log
