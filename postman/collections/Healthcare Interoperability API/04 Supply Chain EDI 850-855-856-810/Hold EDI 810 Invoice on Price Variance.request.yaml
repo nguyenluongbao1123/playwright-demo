@@ -1,0 +1,29 @@
+$kind: http-request
+name: 'Hold EDI 810 Invoice on Unit Price Variance'
+method: POST
+url: '{{api_base_url}}/edi/810-invoice'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rawX12": "ISA*00*          *00*          *ZZ*MEDLINEVN01    *ZZ*DNHOSP01       *261126*0900*^*00501*000081012*0*T*:~GS*IN*MEDLINEVN01*DNHOSP01*20261126*0900*1*X*005010~ST*810*0001~BIG*20261126*INV-PM-PVAR*20261125*{{active_po_number}}~IT1*1*50*EA*29.00**VP*{{sample_sku}}~TDS*145000~CTT*1~SE*6*0001~GE*1*1~IEA*1*000081012~"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Over-priced EDI 810 Invoice ($29.00 vs $24.50 PO) is held with HTTP 422', () => {
+        pm.response.to.have.status(422);
+      });
+
+      pm.test('Reports HELD_PRICE_VARIANCE and EDI_810_3WAY_MATCH_PRICE_VARIANCE', () => {
+        const body = pm.response.json();
+        pm.expect(body.matchStatus).to.eql('HELD_PRICE_VARIANCE');
+        pm.expect(body.errorCode).to.eql('EDI_810_3WAY_MATCH_PRICE_VARIANCE');
+        pm.expect(body.contractedUnitPrice).to.eql(24.5);
+        pm.expect(body.invoicedUnitPrice).to.eql(29);
+      });

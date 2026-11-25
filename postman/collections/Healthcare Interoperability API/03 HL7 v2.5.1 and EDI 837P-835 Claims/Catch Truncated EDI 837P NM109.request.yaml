@@ -1,0 +1,28 @@
+$kind: http-request
+name: 'Catch Truncated EDI 837P NM109 Subscriber ID'
+method: POST
+url: '{{api_base_url}}/edi/837-claim'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rawX12": "ISA*00*          *00*          *ZZ*DNHOSP01       *ZZ*EDI-837-VN01   *261125*1030*^*00501*000000912*0*T*:~GS*HC*DNHOSP01*{{payer_id}}*20261125*1030*1*X*005010X222A1~ST*837*0001*005010X222A1~BHT*0019*00*CLM2026TRUNC*20261125*1030*CH~NM1*IL*1*NGUYEN*AN****MI*SUB-99~CLM*CLM2026TRUNC*150.00***11:B:1*Y*A*Y*Y~HI*ABK:K3580~LX*1~SV1*HC:99214*150.00*UN*1***1~SE*10*0001~GE*1*1~IEA*1*000000912~"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Truncated NM109 Subscriber ID (< 8 chars) is rejected with HTTP 400', () => {
+        pm.response.to.have.status(400);
+      });
+
+      pm.test('Flags REJECTED_999 (IK5*R*I6) and EDI_SEGMENT_TRUNCATION defect code', () => {
+        const body = pm.response.json();
+        pm.expect(body.status).to.eql('REJECTED_999');
+        pm.expect(body.functionalAck999).to.eql('IK5*R*I6');
+        pm.expect(body.defectCode).to.eql('EDI_SEGMENT_TRUNCATION');
+      });

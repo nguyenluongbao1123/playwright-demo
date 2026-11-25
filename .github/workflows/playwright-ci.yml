@@ -31,11 +31,31 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Install Postman CLI
+        run: npm install -g postman-cli
+
       - name: Install Chromium Browser & System Dependencies
         run: npx playwright install --with-deps chromium
 
       - name: TypeScript & POM Strict Contract Gate
         run: npm run typecheck
+
+      - name: Postman v3 Collection & Environment Lint Gate
+        run: npm run postman:lint
+
+      - name: Execute Postman v3 Healthcare API Collection
+        run: |
+          npm run mock:server &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID 2>/dev/null || true" EXIT
+          for i in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:4173/health >/dev/null && break
+            sleep 0.5
+          done
+          postman collection run "postman/collections/Healthcare Interoperability API" \
+            -e "postman/environments/Local Sandbox.environment.yaml" \
+            --output test-results/postman-run \
+            --no-report-events
 
       - name: Execute Seed, HL7/EDI Contract API & Clinical E2E Suites
         run: npm test

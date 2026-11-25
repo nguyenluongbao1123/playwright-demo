@@ -1,0 +1,30 @@
+$kind: http-request
+name: 'Block Unmasked SSN in PID-19 (HIPAA Safe-Harbor)'
+method: POST
+url: '{{api_base_url}}/hl7/ingest'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Facility-Code
+    value: '{{facility_code}}'
+body:
+  type: json
+  content: |-
+    {
+      "rawHl7": "MSH|^~\\&|EHR_PORTAL|{{facility_code}}|HIS_CORE|NATIONAL_HIE|20261125103000||ADT^A01|MSG-PM-PHI01|P|2.5.1\rPID|1||{{sample_mrn}}^^^{{facility_code}}^MR||NGUYEN^AN||19880514|M|||||||||||123-45-6789\rPV1|1|O|OPD^RM204^BED1"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Unmasked 9-digit SSN in PID-19 is rejected with HTTP 422', () => {
+        pm.response.to.have.status(422);
+      });
+
+      pm.test('HL7 engine returns MSA|AE with HIPAA_PHI_UNMASKED_SSN_REJECTED', () => {
+        const body = pm.response.json();
+        pm.expect(body.ackCode).to.eql('AE');
+        pm.expect(body.errorCode).to.eql('HIPAA_PHI_UNMASKED_SSN_REJECTED');
+        pm.expect(body.rawAck).to.include('MSA|AE|MSG-PM-PHI01|HIPAA_PHI_UNMASKED_SSN_REJECTED');
+      });

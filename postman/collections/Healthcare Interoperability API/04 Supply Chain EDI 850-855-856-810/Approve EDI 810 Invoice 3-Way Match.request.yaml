@@ -1,0 +1,28 @@
+$kind: http-request
+name: 'Approve EDI 810 Invoice (3-Way Match Pass)'
+method: POST
+url: '{{api_base_url}}/edi/810-invoice'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rawX12": "ISA*00*          *00*          *ZZ*MEDLINEVN01    *ZZ*DNHOSP01       *261126*0900*^*00501*000081011*0*T*:~GS*IN*MEDLINEVN01*DNHOSP01*20261126*0900*1*X*005010~ST*810*0001~BIG*20261126*INV-PM-8801*20261125*{{active_po_number}}~IT1*1*50*EA*24.50**VP*{{sample_sku}}~TDS*122500~CTT*1~SE*6*0001~GE*1*1~IEA*1*000081011~"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('3-Way Matched EDI 810 Invoice returns HTTP 200 OK', () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test('Approves $1,225.00 payable matching 850 PO price and 856 ASN shipped qty', () => {
+        const body = pm.response.json();
+        pm.expect(body.matchStatus).to.eql('THREE_WAY_MATCH_APPROVED');
+        pm.expect(body.matchedShippedQty).to.eql(50);
+        pm.expect(body.approvedPayableAmount).to.eql(1225);
+      });

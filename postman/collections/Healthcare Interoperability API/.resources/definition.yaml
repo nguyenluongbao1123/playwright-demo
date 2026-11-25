@@ -1,0 +1,22 @@
+$kind: collection
+name: Healthcare Interoperability API
+description: 'Contract and workflow regression suite for the CareFlow EHR, HL7 v2.5.1 (ADT/ORM/SIU), HIPAA Safe-Harbor, ASC X12 EDI 837P/835 Claims, and EDI 850/855/856/810 Supply Chain 3-Way Match API.'
+auth:
+  type: noauth
+variables:
+  - key: base_url
+    value: 'http://127.0.0.1:4173'
+  - key: api_base_url
+    value: 'http://127.0.0.1:4173/v1'
+  - key: facility_code
+    value: 'DN-HOSP-01'
+  - key: sample_mrn
+    value: 'MRN-2026-8841'
+  - key: sample_sku
+    value: 'MED-SUP-402'
+  - key: critical_sku
+    value: 'MED-SUP-109'
+  - key: payer_id
+    value: 'EDI-837-VN01'
+  - key: active_po_number
+    value: 'PO-2026-PM402'

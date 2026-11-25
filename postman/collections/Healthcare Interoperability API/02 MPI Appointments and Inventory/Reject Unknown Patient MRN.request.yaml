@@ -1,0 +1,20 @@
+$kind: http-request
+method: GET
+url: '{{api_base_url}}/patients/:mrn'
+order: 2000
+pathVariables:
+  - key: mrn
+    value: 'MRN-9999-0000'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Unregistered MRN returns HTTP 404 Not Found', () => {
+        pm.response.to.have.status(404);
+      });
+
+      pm.test('Error payload does not leak other MPI patient records', () => {
+        const body = pm.response.json();
+        pm.expect(body.error).to.include('MRN-9999-0000 not found');
+        pm.expect(body).to.not.have.property('patients');
+      });

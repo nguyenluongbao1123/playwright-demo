@@ -1,0 +1,31 @@
+$kind: http-request
+name: 'Trigger Low-Stock Auto-EDI 850 Reorder Alert'
+method: POST
+url: '{{api_base_url}}/orders'
+order: 6000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "mrn": "{{sample_mrn}}",
+      "sku": "{{critical_sku}}",
+      "quantity": 4,
+      "urgency": "STAT",
+      "paVerified": true
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Dispensing below threshold returns HTTP 201', () => {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test('Remaining stock (14 <= 15) triggers automated EDI 850 reorder flag', () => {
+        const body = pm.response.json();
+        pm.expect(body.remainingStock).to.eql(14);
+        pm.expect(body.reorderTriggered).to.eql(true);
+      });

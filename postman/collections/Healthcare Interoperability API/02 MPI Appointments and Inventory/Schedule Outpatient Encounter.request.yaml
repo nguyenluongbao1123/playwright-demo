@@ -1,0 +1,33 @@
+$kind: http-request
+name: 'Schedule Outpatient Encounter (HL7 ADT-A04 & SIU-S12)'
+method: POST
+url: '{{api_base_url}}/appointments'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "mrn": "{{sample_mrn}}",
+      "department": "SURGERY",
+      "appointmentDate": "2026-12-10",
+      "slot": "10:30",
+      "priority": "URGENT",
+      "notes": "Pre-op sterile kit reservation verified"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Appointment creation returns HTTP 201 Created', () => {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test('Encounter emits both HL7 ADT^A04 ACK and HL7 SIU^S12 dispatch status', () => {
+        const body = pm.response.json();
+        pm.expect(body.appointmentId).to.match(/^APT-2026-\d+$/);
+        pm.expect(body.hl7Ack).to.eql('HL7 ADT^A04 ACK: AA');
+        pm.expect(body.hl7SiuStatus).to.eql('HL7 SIU^S12 Dispatched');
+      });

@@ -1,0 +1,4 @@
+$kind: collection
+name: '03 HL7 v2.5.1 and EDI 837P-835 Claims'
+description: 'HL7 v2.5.1 segment ingestion, HIPAA PID-19 SSN guardrail, and ASC X12 837P -> 999 -> 835 claim adjudication.'
+order: 3000

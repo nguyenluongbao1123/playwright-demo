@@ -1,0 +1,26 @@
+$kind: http-request
+name: 'Reject EDI 856 ASN With Expired FDA Medical Lot'
+method: POST
+url: '{{api_base_url}}/edi/856-asn'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rawX12": "ISA*00*          *00*          *ZZ*MEDLINEVN01    *ZZ*DNHOSP01       *261125*1315*^*00501*000085612*0*T*:~GS*SH*MEDLINEVN01*DNHOSP01*20261125*1315*1*X*005010~ST*856*0001~BSN*00*SHP-PM-EXP*20261125*1315*0001~HL*1**S~HL*2*1*O~PRF*{{active_po_number}}~HL*3*2*P~MAN*GM*001088456700009999~HL*4*3*I~LIN*1*VP*{{sample_sku}}*LT*LOT-2024-EXP~SN1*1*50*EA~DTM*036*20250630~CTT*4~SE*14*0001~GE*1*1~IEA*1*000085612~"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Expired sterile kit lot (DTM*036) is rejected with HTTP 422', () => {
+        pm.response.to.have.status(422);
+      });
+
+      pm.test('Returns FDA_LOT_EXPIRED_REJECTED without overwriting valid ASN receipt', () => {
+        const body = pm.response.json();
+        pm.expect(body.errorCode).to.eql('FDA_LOT_EXPIRED_REJECTED');
+      });

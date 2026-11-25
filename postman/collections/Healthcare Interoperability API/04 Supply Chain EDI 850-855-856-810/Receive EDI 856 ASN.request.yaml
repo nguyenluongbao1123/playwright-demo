@@ -1,0 +1,28 @@
+$kind: http-request
+name: 'Receive EDI 856 ASN (HL S-O-P-I & GS1 SSCC-18)'
+method: POST
+url: '{{api_base_url}}/edi/856-asn'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rawX12": "ISA*00*          *00*          *ZZ*MEDLINEVN01    *ZZ*DNHOSP01       *261125*1315*^*00501*000085611*0*T*:~GS*SH*MEDLINEVN01*DNHOSP01*20261125*1315*1*X*005010~ST*856*0001~BSN*00*SHP-PM-9001*20261125*1315*0001~HL*1**S~TD5*B*2*DHLH*M*COLD_CHAIN_MED~REF*BM*BOL-SHP-PM-9001~HL*2*1*O~PRF*{{active_po_number}}~HL*3*2*P~MAN*GM*001088456700001234~HL*4*3*I~LIN*1*VP*{{sample_sku}}*LT*LOT-2026-PM1~SN1*1*50*EA~DTM*036*20281231~CTT*4~SE*16*0001~GE*1*1~IEA*1*000085611~"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Compliant EDI 856 ASN returns HTTP 201 Created', () => {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test('Verifies 18-digit GS1 SSCC-18 pallet label and non-expired sterile lot', () => {
+        const body = pm.response.json();
+        pm.expect(body.asnStatus).to.eql('ASN_VERIFIED_RECEIVED');
+        pm.expect(body.sscc18).to.eql('001088456700001234');
+        pm.expect(body.shippedQty).to.eql(50);
+      });

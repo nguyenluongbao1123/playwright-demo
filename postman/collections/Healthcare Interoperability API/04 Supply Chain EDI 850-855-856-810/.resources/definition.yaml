@@ -1,0 +1,4 @@
+$kind: collection
+name: '04 Supply Chain EDI 850-855-856-810'
+description: 'Medical Supply Chain Procure-to-Pay: 850 PO -> 855 PO Ack -> 856 ASN (HL & SSCC-18 & FDA Expiry) -> 810 Invoice 3-Way Match.'
+order: 4000

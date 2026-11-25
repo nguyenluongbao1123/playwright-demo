@@ -1,0 +1,37 @@
+name: Local Sandbox
+values:
+  - key: base_url
+    value: 'http://127.0.0.1:4173'
+    enabled: true
+    type: default
+    description: Embedded CareFlow EHR Portal & Gateway root URL
+  - key: api_base_url
+    value: 'http://127.0.0.1:4173/v1'
+    enabled: true
+    type: default
+    description: Healthcare Interoperability REST, HL7 & X12 EDI v1 base URL
+  - key: facility_code
+    value: 'DN-HOSP-01'
+    enabled: true
+    type: default
+    description: Mandatory X-Facility-Code hospital header
+  - key: sample_mrn
+    value: 'MRN-2026-8841'
+    enabled: true
+    type: default
+    description: HIPAA Safe-Harbor synthetic patient MRN
+  - key: sample_sku
+    value: 'MED-SUP-402'
+    enabled: true
+    type: default
+    description: Standard sterile surgical kit SKU (initial stock 120)
+  - key: critical_sku
+    value: 'MED-SUP-109'
+    enabled: true
+    type: default
+    description: Low-stock threshold catheter SKU (initial stock 18, threshold 15)
+  - key: payer_id
+    value: 'EDI-837-VN01'
+    enabled: true
+    type: default
+    description: Clearinghouse Payer ID for X12 EDI 837P/835 claims

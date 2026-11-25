@@ -1,0 +1,31 @@
+$kind: http-request
+name: 'Block Supply Order Without Prior Authorization (PA Gate)'
+method: POST
+url: '{{api_base_url}}/orders'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "mrn": "{{sample_mrn}}",
+      "sku": "{{sample_sku}}",
+      "quantity": 15,
+      "urgency": "ROUTINE",
+      "paVerified": false
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Unverified Prior Authorization is blocked with HTTP 422', () => {
+        pm.response.to.have.status(422);
+      });
+
+      pm.test('Response returns PA_VERIFICATION_REQUIRED guardrail code', () => {
+        const body = pm.response.json();
+        pm.expect(body.code).to.eql('PA_VERIFICATION_REQUIRED');
+        pm.expect(body.error).to.include('Prior Authorization (PA) verification is required');
+      });

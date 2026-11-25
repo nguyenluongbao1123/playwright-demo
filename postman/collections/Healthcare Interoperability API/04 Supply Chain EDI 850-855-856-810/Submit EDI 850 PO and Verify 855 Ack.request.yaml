@@ -1,0 +1,30 @@
+$kind: http-request
+name: 'Submit EDI 850 PO & Receive EDI 855 Ack (BAK-AC)'
+method: POST
+url: '{{api_base_url}}/edi/850-po'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rawX12": "ISA*00*          *00*          *ZZ*DNHOSP01       *ZZ*MEDLINEVN01    *261125*0800*^*00501*000085011*0*T*:~GS*PO*DNHOSP01*MEDLINEVN01*20261125*0800*1*X*005010~ST*850*0001~BEG*00*NE*{{active_po_number}}**20261125~N1*BY*DANANG GENERAL HOSPITAL*92*{{facility_code}}~N1*SE*MEDLINE HEALTHCARE SUPPLY*92*MEDLINE-VN01~PO1*1*50*EA*24.50*PE*VP*{{sample_sku}}~CTT*1*50~SE*7*0001~GE*1*1~IEA*1*000085011~"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('EDI 850 Purchase Order accepted with HTTP 201', () => {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test('Synchronous EDI 855 returns BAK*00*AC and ACK*IA*50*EA acceptance', () => {
+        const body = pm.response.json();
+        pm.expect(body.ack855Type).to.eql('AC');
+        pm.expect(body.poStatus).to.eql('ACKNOWLEDGED_AC');
+        pm.expect(body.totalPoAmount).to.eql(1225);
+        pm.expect(body.rawEdi855).to.include('BAK*00*AC*');
+        pm.expect(body.rawEdi855).to.include('ACK*IA*50*EA*');
+      });

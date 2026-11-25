@@ -1,0 +1,24 @@
+$kind: http-request
+name: 'Lookup Patient MPI and EDI-271 Eligibility'
+method: GET
+url: '{{api_base_url}}/patients/:mrn'
+order: 1000
+pathVariables:
+  - key: mrn
+    value: '{{sample_mrn}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Registered patient MRN returns HTTP 200', () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test('Patient record includes active EDI-271 eligibility and masks SSN', () => {
+        const body = pm.response.json();
+        pm.expect(body.mrn).to.eql(pm.variables.get('sample_mrn'));
+        pm.expect(body.fullName).to.eql('Nguyen Van An');
+        pm.expect(body.insurancePayerId).to.eql(pm.variables.get('payer_id'));
+        pm.expect(body.ediEligibilityStatus).to.eql('EDI-271 Active');
+        pm.expect(body).to.not.have.property('ssn');
+      });

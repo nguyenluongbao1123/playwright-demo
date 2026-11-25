@@ -14,6 +14,8 @@
     "test:no-flaky": "playwright test --grep-invert @flaky",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
+    "postman:lint": "postman collection lint \"postman/collections/Healthcare Interoperability API\" && postman environment lint \"postman/environments/Local Sandbox.environment.yaml\" --fail-severity warning",
+    "postman:test": "postman collection run \"postman/collections/Healthcare Interoperability API\" -e \"postman/environments/Local Sandbox.environment.yaml\"",
     "mock:server": "tsx mocks/healthcare-server.ts",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"

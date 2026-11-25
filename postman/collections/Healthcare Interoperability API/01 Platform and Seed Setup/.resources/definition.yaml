@@ -1,0 +1,4 @@
+$kind: collection
+name: '01 Platform and Seed Setup'
+description: 'Gateway availability check and deterministic hospital seed initialization.'
+order: 1000

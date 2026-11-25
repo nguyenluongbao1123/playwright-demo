@@ -1,0 +1,22 @@
+$kind: http-request
+name: 'Verify Inventory SKU Status After Deduction'
+method: GET
+url: '{{api_base_url}}/inventory/:sku'
+order: 7000
+pathVariables:
+  - key: sku
+    value: '{{critical_sku}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Inventory SKU lookup returns HTTP 200', () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test('Inventory ledger reflects remaining stock 14 and LOW_STOCK_REORDER status', () => {
+        const body = pm.response.json();
+        pm.expect(body.sku).to.eql(pm.variables.get('critical_sku'));
+        pm.expect(body.availableStock).to.eql(14);
+        pm.expect(body.status).to.eql('LOW_STOCK_REORDER');
+      });

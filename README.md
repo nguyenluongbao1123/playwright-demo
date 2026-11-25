@@ -62,6 +62,9 @@ healthcare-playwright-agentic-qa/
 │   ├── BasePage.ts                      # Shared navigation, session banner & baseline assertions
 │   ├── PatientPortalPage.ts             # MPI lookup, EDI-271 check & HL7 ADT^A04 encounter booking
 │   └── OrderInventoryPage.ts            # Supply order creation (ORM^O01) & stock reconciliation
+├── postman/
+│   ├── collections/                     # Git-native Postman v3 YAML API contract suite (18 requests / 36 assertions)
+│   └── environments/                    # Local Sandbox environment configuration (zero hardcoded secrets)
 ├── utils/
 │   ├── hl7-edi-builder.ts               # Deterministic HL7 v2.5.1 & ASC X12 837P payload builders
 │   └── baseline-validator.ts            # Cross-checks live DOM hooks against dom-structure.yaml
@@ -126,6 +129,8 @@ npm run test:edi:supply-chain    # Supply Chain Procure-to-Pay 850 -> 855 -> 856
 npm run test:e2e                 # Chromium E2E Page Object workflows
 npm run test:headed              # Watch E2E clinical flows in visible browser
 npm run report                   # Open interactive Playwright HTML report
+npm run postman:lint             # Validate Git-native Postman v3 collection & environment schema
+npm run postman:test             # Run all 18 Postman API requests (requires mock:server running)
 ```
 
 ### Pointing Against External Hospital Staging / UAT

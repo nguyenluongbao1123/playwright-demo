@@ -1,0 +1,4 @@
+$kind: collection
+name: '02 MPI Appointments and Inventory'
+description: 'Master Patient Index (EDI-271), Outpatient Scheduling (HL7 ADT/SIU), Prior Authorization (PA Gate), and Clinical Inventory deduction.'
+order: 2000

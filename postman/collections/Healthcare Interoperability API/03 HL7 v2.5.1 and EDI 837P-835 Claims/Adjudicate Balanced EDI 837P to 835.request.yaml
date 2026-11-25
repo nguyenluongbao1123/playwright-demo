@@ -1,0 +1,30 @@
+$kind: http-request
+name: 'Adjudicate Balanced EDI 837P Claim into 835 Remittance'
+method: POST
+url: '{{api_base_url}}/edi/837-claim'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rawX12": "ISA*00*          *00*          *ZZ*DNHOSP01       *ZZ*EDI-837-VN01   *261125*1030*^*00501*000000911*0*T*:~GS*HC*DNHOSP01*{{payer_id}}*20261125*1030*1*X*005010X222A1~ST*837*0001*005010X222A1~BHT*0019*00*CLM2026PM01*20261125*1030*CH~NM1*41*2*DANANG GENERAL HOSPITAL*****46*DN-HOSP-01~NM1*40*2*VIETCARE CLEARINGHOUSE*****46*{{payer_id}}~HL*1**20*1~NM1*85*2*DANANG SURGICAL CENTER*****XX*1234567893~HL*2*1*22*0~SBR*P*18*******CI~NM1*IL*1*NGUYEN*AN****MI*{{sample_mrn}}~NM1*PR*2*VIETCARE PAYER*****PI*{{payer_id}}~CLM*CLM2026PM01*250.00***11:B:1*Y*A*Y*Y~HI*ABK:K3580~LX*1~SV1*HC:99214*150.00*UN*1***1~DTP*472*D8*20261125~LX*2~SV1*HC:36415*100.00*UN*2***1~DTP*472*D8*20261125~SE*19*0001~GE*1*1~IEA*1*000000911~"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Balanced X12 837P claim returns HTTP 201 Created', () => {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test('Returns 999 IK5*A and reconciles 80/20 split in X12 835 CLP segment', () => {
+        const body = pm.response.json();
+        pm.expect(body.functionalAck999).to.eql('IK5*A');
+        pm.expect(body.allowedAmount).to.eql(250);
+        pm.expect(body.payerPaidAmount).to.eql(200);
+        pm.expect(body.patientResponsibility).to.eql(50);
+        pm.expect(body.rawEdi835).to.include('CLP*CLM2026PM01*1*250.00*200.00*50.00*');
+      });

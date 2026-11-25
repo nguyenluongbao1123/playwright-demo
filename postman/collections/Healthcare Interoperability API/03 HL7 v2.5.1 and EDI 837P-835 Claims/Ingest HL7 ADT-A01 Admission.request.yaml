@@ -1,0 +1,31 @@
+$kind: http-request
+name: 'Ingest HL7 v2.5.1 ADT-A01 Patient Admission'
+method: POST
+url: '{{api_base_url}}/hl7/ingest'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Facility-Code
+    value: '{{facility_code}}'
+body:
+  type: json
+  content: |-
+    {
+      "rawHl7": "MSH|^~\\&|EHR_PORTAL|{{facility_code}}|HIS_CORE|NATIONAL_HIE|20261125103000||ADT^A01|MSG-PM-ADT01|P|2.5.1\rPID|1||{{sample_mrn}}^^^{{facility_code}}^MR||NGUYEN^AN||19880514|M|||||||||||\rPV1|1|I|SURG^OR02^BED01||||CLN-5082^Tran^Minh^MD"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Valid HL7 ADT^A01 payload returns HTTP 200', () => {
+        pm.response.to.have.status(200);
+      });
+
+      pm.test('Returns MSA|AA acknowledgment echoing original message control ID', () => {
+        const body = pm.response.json();
+        pm.expect(body.ackCode).to.eql('AA');
+        pm.expect(body.messageControlId).to.eql('MSG-PM-ADT01');
+        pm.expect(body.parsedPatientMrn).to.eql(pm.variables.get('sample_mrn'));
+        pm.expect(body.rawAck).to.include('MSA|AA|MSG-PM-ADT01|MESSAGE_ACCEPTED');
+      });

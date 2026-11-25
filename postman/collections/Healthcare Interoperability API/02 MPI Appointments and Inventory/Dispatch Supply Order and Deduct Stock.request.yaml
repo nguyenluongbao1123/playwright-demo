@@ -1,0 +1,33 @@
+$kind: http-request
+name: 'Dispatch Supply Order & Deduct Stock Atomically'
+method: POST
+url: '{{api_base_url}}/orders'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "mrn": "{{sample_mrn}}",
+      "sku": "{{sample_sku}}",
+      "quantity": 5,
+      "urgency": "ROUTINE",
+      "paVerified": true
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Verified clinical order returns HTTP 201 Created', () => {
+        pm.response.to.have.status(201);
+      });
+
+      pm.test('Stock deducts from 120 to 115 and emits HL7 ORM^O01 ACK AA', () => {
+        const body = pm.response.json();
+        pm.expect(body.orderId).to.match(/^ORD-2026-\d+$/);
+        pm.expect(body.remainingStock).to.eql(115);
+        pm.expect(body.reorderTriggered).to.eql(false);
+        pm.expect(body.hl7OrmAck).to.eql('HL7 ORM^O01 ACK: AA');
+      });
